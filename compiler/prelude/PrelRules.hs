@@ -33,7 +33,7 @@ import CoreSyn
 import MkCore
 import Id
 import Literal
-import CoreOpt     ( exprIsLiteral_maybe )
+import CoreOpt     ( exprIsLiteral_maybe, exprIsSatConApp_maybe )
 import PrimOp      ( PrimOp(..), tagToEnumKey )
 import TysWiredIn
 import TysPrim
@@ -916,8 +916,7 @@ dataToTagRule = a `mplus` b
     b = do
       dflags <- getDynFlags
       [_, val_arg] <- getArgs
-      in_scope <- getInScopeEnv
-      (dc,_,_) <- liftMaybe $ exprIsConApp_maybe in_scope val_arg
+      dc <- liftMaybe $ exprIsSatConApp_maybe val_arg
       ASSERT( not (isNewTyCon (dataConTyCon dc)) ) return ()
       return $ mkIntVal dflags (toInteger (dataConTagZ dc))
 
